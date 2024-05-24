@@ -70,9 +70,9 @@ def download_comments(comments, filename, folder='comments/'):
 
 
 def parse_book_page(soup):
-    tittle2, author2 = soup.find('h1').text.split('::')
-    tittle = sanitize_filename(tittle2.strip())
-    author = sanitize_filename(author2.strip())
+    not_sanitized_tittle, not_sanitized_author = soup.find('h1').text.split('::')
+    tittle = sanitize_filename(not_sanitized_tittle.strip())
+    author = sanitize_filename(not_sanitized_author.strip())
 
     comments_tag = soup.find_all(class_='texts')
     comments = [comment.find(class_='black').text for comment in comments_tag]
