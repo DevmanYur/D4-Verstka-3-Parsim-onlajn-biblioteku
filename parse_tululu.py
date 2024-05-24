@@ -6,6 +6,7 @@ from requests import HTTPError
 from pathvalidate import sanitize_filename
 from bs4 import BeautifulSoup
 import logging
+import time
 
 
 logger = logging.getLogger('Logger')
@@ -113,6 +114,10 @@ def main():
             download_comments(comments, f'{page}. {tittle} - комментарии')
         except HTTPError:
             logger.warning(f'Страница {url}/b{page} не существует')
+            continue
+        except ConnectionError:
+            logger.warning('Потеряно соединение с интернетом')
+            time.sleep(5)
             continue
 
 
