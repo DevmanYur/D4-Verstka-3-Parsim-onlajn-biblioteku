@@ -12,8 +12,8 @@ import time
 logger = logging.getLogger('Logger')
 
 
-def get_soup(url, page):
-    response = requests.get(f'{url}/b{page}/')
+def get_soup(url, id_book):
+    response = requests.get(f'{url}/b{id_book}/')
     response.raise_for_status()
     check_for_redirect(response)
     soup = BeautifulSoup(response.text, 'lxml')
@@ -26,9 +26,9 @@ def check_for_redirect(response):
                 raise HTTPError
 
 
-def download_txt(url, page, filename, folder='books/'):
+def download_txt(url, id_book, filename, folder='books/'):
     url_txt = f"{url}/txt.php"
-    payload_txt = {'id': page}
+    payload_txt = {'id': id_book}
     response = requests.get(url_txt, params=payload_txt)
     response.raise_for_status()
     check_for_redirect(response)
@@ -66,7 +66,7 @@ def download_comments(comments, filename, folder='comments/'):
     return filepath
 
 
-def parse_book_page(soup):
+def parse_book_id_book(soup):
     not_sanitized_tittle, not_sanitized_author = soup.find('h1').text.split('::')
     tittle = sanitize_filename(not_sanitized_tittle.strip())
     author = sanitize_filename(not_sanitized_author.strip())
@@ -101,15 +101,15 @@ def main():
     url = 'https://tululu.org'
     start_id, end_id = get_arguments()
 
-    for page in range(start_id, end_id + 1):
+    for id_book in range(start_id, end_id + 1):
         try:
-            soup = get_soup(url, page)
-            tittle, author, comments, genres, image, image_tag = parse_book_page(soup)
-            download_txt(url, page, f'{page}. {tittle}')
+            soup = get_soup(url, id_book)
+            tittle, author, comments, genres, image, image_tag = parse_book_id_book(soup)
+            download_txt(url, id_book, f'{id_book}. {tittle}')
             download_image(url, image_tag, image)
-            download_comments(comments, f'{page}. {tittle} - комментарии')
+            download_comments(comments, f'{id_book}. {tittle} - комментарии')
         except HTTPError:
-            logger.warning(f'Страница {url}/b{page} не существует')
+            logger.warning(f'Страница {url}/b{id_book} не существует')
             continue
         except ConnectionError:
             logger.warning('Потеряно соединение с интернетом')
