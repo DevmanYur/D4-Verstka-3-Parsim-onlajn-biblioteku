@@ -42,7 +42,7 @@ def download_txt(url, page, filename, folder='books/'):
     return filepath
 
 
-def download_images(url, image_tag, filename, folder='images/'):
+def download_image(url, image_tag, filename, folder='images/'):
     url_image = f'{url}{image_tag}'
     response = requests.get(url_image)
     response.raise_for_status()
@@ -105,7 +105,7 @@ def main():
             soup = get_soup(url, page)
             tittle, author, comments, genres, image, image_tag = parse_book_page(soup)
             download_txt(url, page, f'{page}. {tittle}')
-            download_images(url, image_tag, image)
+            download_image(url, image_tag, image)
             download_comments(comments, f'{page}. {tittle} - комментарии')
         except HTTPError:
             logger.warning(f'Страница {url}/b{page} не существует')
