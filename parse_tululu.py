@@ -60,7 +60,8 @@ def download_comments(comments, filename, folder='comments/'):
     Path(folder).mkdir(parents=True, exist_ok=True)
     filepath_without_format = os.path.join(folder, sanitize_filename(filename))
     filepath = f'{filepath_without_format}.txt'
-    with open(filepath, 'w') : comments
+    with open(filepath, 'w') as file:
+        file.writelines(f"{comment}\n" for comment in comments)
 
     return filepath
 
