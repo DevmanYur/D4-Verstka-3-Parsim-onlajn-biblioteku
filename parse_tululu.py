@@ -66,7 +66,7 @@ def download_comments(comments, filename, folder='comments/'):
     return filepath
 
 
-def parse_book_id_book(soup):
+def parse_book_page(soup):
     not_sanitized_tittle, not_sanitized_author = soup.find('h1').text.split('::')
     tittle = sanitize_filename(not_sanitized_tittle.strip())
     author = sanitize_filename(not_sanitized_author.strip())
@@ -79,8 +79,9 @@ def parse_book_id_book(soup):
 
     image_tag = soup.find(class_='bookimage').find('img')['src']
     image = image_tag.split('/')[-1]
+    parse_book = tittle, author, comments, genres, image, image_tag
 
-    return tittle, author, comments, genres, image, image_tag
+    return parse_book
 
 
 def get_arguments():
@@ -104,7 +105,7 @@ def main():
     for id_book in range(start_id, end_id + 1):
         try:
             soup = get_soup(url, id_book)
-            tittle, author, comments, genres, image, image_tag = parse_book_id_book(soup)
+            tittle, author, comments, genres, image, image_tag = parse_book_page(soup)
             download_txt(url, id_book, f'{id_book}. {tittle}')
             download_image(url, image_tag, image)
             download_comments(comments, f'{id_book}. {tittle} - комментарии')
