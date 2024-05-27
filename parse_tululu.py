@@ -7,6 +7,7 @@ from pathvalidate import sanitize_filename
 from bs4 import BeautifulSoup
 import logging
 import time
+from urllib.parse import urljoin
 
 
 logger = logging.getLogger('Logger')
@@ -43,7 +44,7 @@ def download_txt(url, id_book, filename, folder='books/'):
 
 
 def download_image(url, image, filename, folder='images/'):
-    url = f'{url}{image}'
+    url = urljoin(url, image)
     response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
