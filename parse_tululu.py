@@ -13,8 +13,8 @@ from urllib.parse import urljoin
 logger = logging.getLogger('Logger')
 
 
-def get_soup(url, id_book):
-    response = requests.get(f'{url}/b{id_book}/')
+def get_soup(url, book_id):
+    response = requests.get(f'{url}/b{book_id}/')
     response.raise_for_status()
     check_for_redirect(response)
     soup = BeautifulSoup(response.text, 'lxml')
@@ -27,9 +27,9 @@ def check_for_redirect(response):
                 raise HTTPError
 
 
-def download_txt(url, id_book, filename, folder='books/'):
+def download_txt(url, book_id, filename, folder='books/'):
     url = f"{url}/txt.php"
-    payload_txt = {'id': id_book}
+    payload_txt = {'id': book_id}
     response = requests.get(url, params=payload_txt)
     response.raise_for_status()
     check_for_redirect(response)
@@ -103,15 +103,15 @@ def main():
     url = 'https://tululu.org'
     start_id, end_id = get_arguments()
 
-    for id_book in range(start_id, end_id + 1):
+    for book_id in range(start_id, end_id + 1):
         try:
-            soup = get_soup(url, id_book)
+            soup = get_soup(url, book_id)
             tittle, author, comments, genres, image, image_tag = parse_book_page(soup)
-            download_txt(url, id_book, f'{id_book}. {tittle}')
+            download_txt(url, book_id, f'{book_id}. {tittle}')
             download_image(url, image_tag, image)
-            download_comments(comments, f'{id_book}. {tittle} - комментарии')
+            download_comments(comments, f'{book_id}. {tittle} - комментарии')
         except HTTPError:
-            logger.warning(f'Страница {url}/b{id_book} не существует')
+            logger.warning(f'Страница {url}/b{book_id} не существует')
             continue
         except ConnectionError:
             logger.warning('Потеряно соединение с интернетом')
