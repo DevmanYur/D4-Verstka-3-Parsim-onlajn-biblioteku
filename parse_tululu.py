@@ -27,9 +27,9 @@ def check_for_redirect(response):
 
 
 def download_txt(url, id_book, filename, folder='books/'):
-    url_txt = f"{url}/txt.php"
+    url = f"{url}/txt.php"
     payload_txt = {'id': id_book}
-    response = requests.get(url_txt, params=payload_txt)
+    response = requests.get(url, params=payload_txt)
     response.raise_for_status()
     check_for_redirect(response)
 
@@ -42,9 +42,9 @@ def download_txt(url, id_book, filename, folder='books/'):
     return filepath
 
 
-def download_image(url, image_tag, filename, folder='images/'):
-    url_image = f'{url}{image_tag}'
-    response = requests.get(url_image)
+def download_image(url, image, filename, folder='images/'):
+    url = f'{url}{image}'
+    response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
 
