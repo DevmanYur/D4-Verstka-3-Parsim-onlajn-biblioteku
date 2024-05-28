@@ -18,8 +18,9 @@ def get_soup(url, book_id):
     response.raise_for_status()
     check_for_redirect(response)
     soup = BeautifulSoup(response.text, 'lxml')
+    page_url = response.url
 
-    return soup
+    return soup, page_url
 
 
 def check_for_redirect(response):
@@ -43,8 +44,8 @@ def download_txt(url, book_id, filename, folder='books/'):
     return filepath
 
 
-def download_image(url, image_link, filename, folder='images/'):
-    url = urljoin(url, image_link)
+def download_image(page_url, image_link, filename, folder='images/'):
+    url = urljoin(page_url, image_link)
     response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
@@ -105,10 +106,10 @@ def main():
 
     for book_id in range(start_id, end_id + 1):
         try:
-            soup = get_soup(url, book_id)
+            soup, page_url = get_soup(url, book_id)
             tittle, author, comments, genres, image_name, image_link = parse_book_page(soup)
             download_txt(url, book_id, f'{book_id}. {tittle}')
-            download_image(url, image_link, image_name)
+            download_image(page_url, image_link, image_name)
             download_comments(comments, f'{book_id}. {tittle} - комментарии')
         except HTTPError:
             logger.warning(f'Страница {url}/b{book_id} не существует')
