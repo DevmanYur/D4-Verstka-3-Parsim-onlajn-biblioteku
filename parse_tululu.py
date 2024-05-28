@@ -80,9 +80,9 @@ def parse_book_page(soup):
 
     image_link = soup.find(class_='bookimage').find('img')['src']
     image_name = image_link.split('/')[-1]
-    parse_book = tittle, author, comments, genres, image_name, image_link
+    parsing_book = tittle, author, comments, genres, image_name, image_link
 
-    return parse_book
+    return parsing_book
 
 
 def get_arguments():
