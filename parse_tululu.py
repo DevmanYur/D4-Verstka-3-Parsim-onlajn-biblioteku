@@ -43,8 +43,8 @@ def download_txt(url, book_id, filename, folder='books/'):
     return filepath
 
 
-def download_image(url, image, filename, folder='images/'):
-    url = urljoin(url, image)
+def download_image(url, image_link, filename, folder='images/'):
+    url = urljoin(url, image_link)
     response = requests.get(url)
     response.raise_for_status()
     check_for_redirect(response)
@@ -78,9 +78,9 @@ def parse_book_page(soup):
     genre_tag = soup.find('span', class_='d_book').find_all('a')
     genres = [genre.text for genre in genre_tag]
 
-    image_tag = soup.find(class_='bookimage').find('img')['src']
-    image = image_tag.split('/')[-1]
-    parse_book = tittle, author, comments, genres, image, image_tag
+    image_link = soup.find(class_='bookimage').find('img')['src']
+    image_name = image_link.split('/')[-1]
+    parse_book = tittle, author, comments, genres, image_name, image_link
 
     return parse_book
 
@@ -106,9 +106,9 @@ def main():
     for book_id in range(start_id, end_id + 1):
         try:
             soup = get_soup(url, book_id)
-            tittle, author, comments, genres, image, image_tag = parse_book_page(soup)
+            tittle, author, comments, genres, image_name, image_link = parse_book_page(soup)
             download_txt(url, book_id, f'{book_id}. {tittle}')
-            download_image(url, image_tag, image)
+            download_image(url, image_link, image_name)
             download_comments(comments, f'{book_id}. {tittle} - комментарии')
         except HTTPError:
             logger.warning(f'Страница {url}/b{book_id} не существует')
