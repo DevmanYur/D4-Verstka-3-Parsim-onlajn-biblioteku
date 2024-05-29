@@ -24,7 +24,8 @@ def check_for_redirect(response):
                 raise HTTPError
 
 
-def download_txt(url, book_id, filename, folder='books/'):
+def download_txt(url, book_id, tittle, folder='books/'):
+    filename = f'{book_id}. {tittle}'
     url = f"{url}/txt.php"
     payload_txt = {'id': book_id}
     response = requests.get(url, params=payload_txt)
@@ -54,7 +55,8 @@ def download_image(page_url, image_link, filename, folder='images/'):
     return filepath
 
 
-def download_comments(comments, filename, folder='comments/'):
+def download_comments(comments, book_id, tittle, folder='comments/'):
+    filename = f'{book_id}. {tittle} - комментарии'
     Path(folder).mkdir(parents=True, exist_ok=True)
     filepath_without_format = os.path.join(folder, sanitize_filename(filename))
     filepath = f'{filepath_without_format}.txt'
@@ -77,7 +79,12 @@ def parse_book_page(soup):
 
     image_link = soup.find(class_='bookimage').find('img')['src']
     image_name = image_link.split('/')[-1]
-    parsing_book = [tittle, author, comments, genres, image_name, image_link]
+    parsing_book = {'tittle' : tittle,
+            'author' : author,
+            'comments' : comments,
+            'genres' : genres,
+            'image_name' :image_name,
+            'image_link' : image_link}
 
     return parsing_book
 
@@ -107,10 +114,10 @@ def main():
             check_for_redirect(response)
             page_url = response.url
             soup = get_soup(response)
-            tittle, author, comments, genres, image_name, image_link = parse_book_page(soup)
-            download_txt(url, book_id, f'{book_id}. {tittle}')
-            download_image(page_url, image_link, image_name)
-            download_comments(comments, f'{book_id}. {tittle} - комментарии')
+            book = parse_book_page(soup)
+            download_txt(url, book_id, book['tittle'])
+            download_image(page_url, book['image_link'], book['image_name'])
+            download_comments(book['comments'], book_id, book['tittle'])
         except HTTPError:
             logger.warning(f'Страница {url}/b{book_id} не существует')
             continue
