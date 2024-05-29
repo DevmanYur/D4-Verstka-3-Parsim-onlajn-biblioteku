@@ -13,14 +13,10 @@ from urllib.parse import urljoin
 logger = logging.getLogger('Logger')
 
 
-def get_soup(url, book_id):
-    response = requests.get(f'{url}/b{book_id}/')
-    response.raise_for_status()
-    check_for_redirect(response)
+def get_soup(response):
     soup = BeautifulSoup(response.text, 'lxml')
-    page_url = response.url
 
-    return soup, page_url
+    return soup
 
 
 def check_for_redirect(response):
@@ -106,7 +102,11 @@ def main():
 
     for book_id in range(start_id, end_id + 1):
         try:
-            soup, page_url = get_soup(url, book_id)
+            response = requests.get(f'{url}/b{book_id}/')
+            response.raise_for_status()
+            check_for_redirect(response)
+            page_url = response.url
+            soup = get_soup(response)
             tittle, author, comments, genres, image_name, image_link = parse_book_page(soup)
             download_txt(url, book_id, f'{book_id}. {tittle}')
             download_image(page_url, image_link, image_name)
