@@ -13,12 +13,6 @@ from urllib.parse import urljoin
 logger = logging.getLogger('Logger')
 
 
-def get_soup(response):
-    soup = BeautifulSoup(response.text, 'lxml')
-
-    return soup
-
-
 def check_for_redirect(response):
             if response.history:
                 raise HTTPError
@@ -113,7 +107,7 @@ def main():
             response.raise_for_status()
             check_for_redirect(response)
             page_url = response.url
-            soup = get_soup(response)
+            soup = BeautifulSoup(response.text, 'lxml')
             book = parse_book_page(soup)
             download_txt(url, book_id, book['tittle'])
             download_image(page_url, book['image_link'], book['image_name'])
